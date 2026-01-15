@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Redirecting...</title>
+  <title>Rebel Chat</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     html, body {
       margin: 0;
@@ -14,12 +13,55 @@
       background: #000;
       overflow: hidden;
     }
+    /* Fullscreen iframe */
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    /* Floating overlay button (hidden at first) */
+    .floating-button {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 9999;
+      padding: 10px 18px;
+      font-size: 16px;
+      background: rgba(0,0,0,0.6);
+      color: #ff0000;
+      border: 2px solid #ff0000;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .floating-button.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .floating-button:hover {
+      background: #ff0000;
+      color: #000;
+    }
+    /* Loader overlay */
     .loader-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100%;
       background: radial-gradient(circle at center, #ff0000 0, #000000 60%);
+      z-index: 999;
     }
     .loader {
       width: 80px;
@@ -36,89 +78,135 @@
   </style>
 </head>
 <body>
-  <div class="loader-container">
+  <!-- Loader -->
+  <div class="loader-container" id="loader">
     <div class="loader"></div>
   </div>
-
+  <!-- Fullscreen iframe -->
+  <div class="iframe-container">
+    <iframe id="mainFrame"></iframe>
+    <!-- Floating overlay button -->
+    <button class="floating-button" id="secureBtn" onclick="loadSecurePass()">
+      Request Full Access (Username Changing)
+    </button>
+  </div>
   <script>
     const redirectURL = "https://padlet.com/hacker114/hacker114-tqre09wyb91i1085";
-
+    let minLoadTimePassed = false;
+    let iframeLoaded = false;
+    let isFullAccess = false;
+    function tryHideLoader() {
+      if (minLoadTimePassed && iframeLoaded) {
+        document.getElementById("loader").style.display = "none";
+        if (!isFullAccess) {
+          document.getElementById("secureBtn").classList.add("visible");
+        }
+      }
+    }
     function setCookie(name, value, days) {
       const d = new Date();
       d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
       document.cookie = name + "=" + value + ";expires=" + d.toUTCString() + ";path=/";
     }
-
     function getCookie(name) {
       const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
       return match ? match[2] : null;
     }
-
     function generateID() {
       return Math.floor(Math.random() * 900000) + 100000;
     }
-
     function loadCronitor() {
       const s = document.createElement('script');
       s.async = true;
       s.src = "https://rum.cronitor.io/script.js";
       document.head.appendChild(s);
-
       window.cronitor = window.cronitor || function() {
         (window.cronitor.q = window.cronitor.q || []).push(arguments);
       };
-
       cronitor('config', { clientKey: '1877bbff8839b2eb851593d7d773c16d' });
     }
-
+    function loadIframe(url) {
+      const frame = document.getElementById("mainFrame");
+      frame.onload = () => {
+        iframeLoaded = true;
+        tryHideLoader();
+      };
+      frame.src = url;
+      // Minimum loader time: 1.75 seconds
+      setTimeout(() => {
+        minLoadTimePassed = true;
+        tryHideLoader();
+      }, 1750);
+    }
+    function loadSecurePass() {
+      iframeLoaded = false;
+      minLoadTimePassed = false;
+      document.getElementById("loader").style.display = "flex";
+      document.getElementById("secureBtn").classList.remove("visible");
+      const id = getCookie("userID");
+      const newPath = "request-" + id;
+      // Update URL
+      history.replaceState(null, "", newPath);
+      // Log to Cronitor
+      cronitor('ping', {
+        monitor: 'user-id-' + id,
+        message: 'Secure request for ID: ' + id,
+        url: newPath
+      });
+      isFullAccess = true;
+      // Load the renamed secure file
+      loadIframe("rebel-padlet-opener.html");
+    }
     function start() {
       let cookieID = getCookie("userID");
       if (!cookieID) {
         cookieID = generateID();
         setCookie("userID", cookieID, 365);
       }
-
-      // Build pretty path
+      // If already on the ID-specific page (e.g., loaded directly as /id.html)
+      if (window.location.pathname.endsWith(cookieID + ".html")) {
+        isFullAccess = true;
+        const cleanPath = window.location.pathname.replace(cookieID + ".html", cookieID);
+        history.replaceState(null, "", cleanPath);
+        loadCronitor();
+        cronitor('ping', {
+          monitor: 'user-id-' + cookieID,
+          message: 'Full Access User ID: ' + cookieID,
+          url: cleanPath
+        });
+        loadIframe("rebel-padlet-opener.html");
+        return;
+      }
+      // Normal start for main page
       const pathParts = window.location.pathname.split("/");
       pathParts.pop();
       const basePath = pathParts.join("/") || "/";
       const expectedPath = (basePath.endsWith("/") ? basePath : basePath + "/") + cookieID;
-
       if (window.location.pathname !== expectedPath) {
         history.replaceState(null, "", expectedPath);
       }
-
       const id = cookieID;
-
-      // Load Cronitor
       loadCronitor();
       cronitor('ping', {
         monitor: 'user-id-' + id,
         message: 'User ID: ' + id,
         url: expectedPath
       });
-
-      // Check if a file exists for this ID
       const dir = expectedPath.substring(0, expectedPath.lastIndexOf("/") + 1);
       const filePath = dir + id + ".html";
-
-      fetch(filePath, { method: "GET" })
+      fetch(filePath, { method: "HEAD" })
         .then(response => {
           if (response.ok) {
-            window.location.href = filePath;
+            isFullAccess = true;
+            loadIframe(filePath);  // Load the ID page in iframe (it will detect and load opener)
           } else {
-            setTimeout(() => {
-              window.location.href = redirectURL;
-            }, 1500);
+            loadIframe(redirectURL);
           }
         })
         .catch(() => {
-          setTimeout(() => {
-            window.location.href = redirectURL;
-          }, 1500);
+          loadIframe(redirectURL);
         });
     }
-
     window.onload = start;
   </script>
 </body>
