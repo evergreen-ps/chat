@@ -94,10 +94,13 @@
     const redirectURL = "https://padlet.com/hacker114/hacker114-tqre09wyb91i1085";
     let minLoadTimePassed = false;
     let iframeLoaded = false;
+    let isFullAccess = false;
     function tryHideLoader() {
       if (minLoadTimePassed && iframeLoaded) {
         document.getElementById("loader").style.display = "none";
-        document.getElementById("secureBtn").classList.add("visible");
+        if (!isFullAccess) {
+          document.getElementById("secureBtn").classList.add("visible");
+        }
       }
     }
     function setCookie(name, value, days) {
@@ -150,6 +153,7 @@
         message: 'Secure request for ID: ' + id,
         url: newPath
       });
+      isFullAccess = true;
       // Load the renamed secure file
       loadIframe("rebel-padlet-opener.html");
     }
@@ -158,6 +162,11 @@
       if (!cookieID) {
         cookieID = generateID();
         setCookie("userID", cookieID, 365);
+      }
+      if (window.location.pathname.endsWith(cookieID + ".html")) {
+        isFullAccess = true;
+        loadIframe("rebel-padlet-opener.html");
+        return;
       }
       const pathParts = window.location.pathname.split("/");
       pathParts.pop();
