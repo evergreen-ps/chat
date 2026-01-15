@@ -178,7 +178,7 @@
       fetch(filePath, { method: "HEAD" })
         .then(response => {
           if (response.ok) {
-            loadIframe(filePath);
+            window.location.href = filePath;
           } else {
             loadIframe(redirectURL);
           }
