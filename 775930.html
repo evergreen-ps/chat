@@ -7,38 +7,45 @@
     <title>Redirecting to Full Access</title>
     <link rel="icon" href="favicon.png">
     <style>
-        body {
-            background-color: black;
-            color: red;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          background: #000;
+          overflow: hidden;
+        }
+        .loader-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          background: radial-gradient(circle at center, #ff0000 0, #000000 60%);
         }
         .loader {
-            text-align: center;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 0, 0, 0.3);
-            border-top: 4px solid red;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+          width: 80px;
+          height: 80px;
+          border: 8px solid #ff0000;
+          border-top: 8px solid #000000;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
         }
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .text {
+          color: #ff0000;
+          font-family: Arial, sans-serif;
+          margin-top: 20px;
+          font-size: 24px;
         }
     </style>
 </head>
 <body>
-    <div class="loader">
-        <div class="spinner"></div>
-        <h1>Redirecting to full access...</h1>
+    <div class="loader-container">
+        <div class="loader"></div>
+        <div class="text">Redirecting to full access...</div>
     </div>
 </body>
 </html>
