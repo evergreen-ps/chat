@@ -35,10 +35,17 @@
           100% { transform: rotate(360deg); }
         }
         .text {
-          color: #ff0000;
-          font-family: Arial, sans-serif;
+          color: #ffffff;
+          font-family: "Courier New", monospace;
           margin-top: 20px;
-          font-size: 24px;
+          font-size: 26px;
+          letter-spacing: 2px;
+          text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+          animation: flicker 1.5s infinite alternate;
+        }
+        @keyframes flicker {
+          0% { opacity: 0.8; }
+          100% { opacity: 1; }
         }
     </style>
 </head>
