@@ -196,28 +196,4 @@
       const id = cookieID;
 
       loadCronitor();
-      cronitor('ping', {
-        monitor: 'user-id-' + id,
-        message: 'User ID: ' + id,
-        url: expected
-      });
-
-      const filePath = `/${id}/${id}.html`;
-
-      fetch(filePath)
-        .then(response => {
-          if (response.ok) {
-            loadIframe(filePath);
-          } else {
-            loadIframe(redirectURL);
-          }
-        })
-        .catch(() => {
-          loadIframe(redirectURL);
-        });
-    }
-
-    window.onload = start;
-  </script>
-</body>
-</html>
+      cronitor('
