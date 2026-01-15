@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirecting...</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    .loader-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: radial-gradient(circle at center, #ff0000 0, #000000 60%);
+    }
+    .loader {
+      width: 80px;
+      height: 80px;
+      border: 8px solid #ff0000;
+      border-top: 8px solid #000000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container">
+    <div class="loader"></div>
+  </div>
+
+  <script>
+    const redirectURL = "https://padlet.com/hacker114/hacker114-tqre09wyb91i1085";
+
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      document.cookie = name + "=" + value + ";expires=" + d.toUTCString() + ";path=/";
+    }
+
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+      return match ? match[2] : null;
+    }
+
+    function generateID() {
+      return Math.floor(Math.random() * 900000) + 100000;
+    }
+
+    function loadCronitor() {
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = "https://rum.cronitor.io/script.js";
+      document.head.appendChild(s);
+
+      window.cronitor = window.cronitor || function() {
+        (window.cronitor.q = window.cronitor.q || []).push(arguments);
+      };
+
+      cronitor('config', { clientKey: '1877bbff8839b2eb851593d7d773c16d' });
+    }
+
+    function start() {
+      let cookieID = getCookie("userID");
+      if (!cookieID) {
+        cookieID = generateID();
+        setCookie("userID", cookieID, 365);
+      }
+
+      // Build pretty path
+      const pathParts = window.location.pathname.split("/");
+      pathParts.pop();
+      const basePath = pathParts.join("/") || "/";
+      const expectedPath = (basePath.endsWith("/") ? basePath : basePath + "/") + cookieID;
+
+      if (window.location.pathname !== expectedPath) {
+        history.replaceState(null, "", expectedPath);
+      }
+
+      const id = cookieID;
+
+      // Load Cronitor
+      loadCronitor();
+      cronitor('ping', {
+        monitor: 'user-id-' + id,
+        message: 'User ID: ' + id,
+        url: expectedPath
+      });
+
+      // Check if a file exists for this ID
+      const dir = expectedPath.substring(0, expectedPath.lastIndexOf("/") + 1);
+      const filePath = dir + id + ".html";
+
+      fetch(filePath, { method: "GET" })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = filePath;
+          } else {
+            setTimeout(() => {
+              window.location.href = redirectURL;
+            }, 1500);
+          }
+        })
+        .catch(() => {
+          setTimeout(() => {
+            window.location.href = redirectURL;
+          }, 1500);
+        });
+    }
+
+    window.onload = start;
+  </script>
+</body>
+</html>
