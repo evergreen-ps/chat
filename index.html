@@ -15,6 +15,7 @@
       overflow: hidden;
     }
 
+    /* Fullscreen iframe */
     .iframe-container {
       position: relative;
       width: 100%;
@@ -28,6 +29,7 @@
       display: block;
     }
 
+    /* Floating overlay button (hidden at first) */
     .floating-button {
       position: absolute;
       bottom: 12px;
@@ -55,6 +57,7 @@
       color: #000;
     }
 
+    /* Loader overlay */
     .loader-container {
       position: absolute;
       top: 0;
@@ -85,13 +88,16 @@
 </head>
 <body>
 
+  <!-- Loader -->
   <div class="loader-container" id="loader">
     <div class="loader"></div>
   </div>
 
+  <!-- Fullscreen iframe -->
   <div class="iframe-container">
     <iframe id="mainFrame"></iframe>
 
+    <!-- Floating overlay button -->
     <button class="floating-button" id="secureBtn" onclick="loadSecurePass()">
       Request Full Access (Username Changing)
     </button>
@@ -148,6 +154,7 @@
 
       frame.src = url;
 
+      // Minimum loader time: 1.75 seconds
       setTimeout(() => {
         minLoadTimePassed = true;
         tryHideLoader();
@@ -164,14 +171,17 @@
       const id = getCookie("userID");
       const newPath = "request-" + id;
 
+      // Update URL
       history.replaceState(null, "", newPath);
 
+      // Log to Cronitor
       cronitor('ping', {
         monitor: 'user-id-' + id,
         message: 'Secure request for ID: ' + id,
         url: newPath
       });
 
+      // Load the renamed secure file
       loadIframe("rebel-padlet-opener.html");
     }
 
@@ -182,18 +192,41 @@
         setCookie("userID", cookieID, 365);
       }
 
-      const current = window.location.pathname.replace(/\/+$/, "");
-      const expected = "/" + cookieID;
+      const pathParts = window.location.pathname.split("/");
+      pathParts.pop();
+      const basePath = pathParts.join("/") || "/";
+      const expectedPath = (basePath.endsWith("/") ? basePath : basePath + "/") + cookieID;
 
-      const parts = current.split("/").filter(Boolean);
-
-      if (current !== expected) {
-        if (parts.length === 0 || parts[parts.length - 1] !== cookieID) {
-          history.replaceState(null, "", expected);
-        }
+      if (window.location.pathname !== expectedPath) {
+        history.replaceState(null, "", expectedPath);
       }
 
       const id = cookieID;
 
       loadCronitor();
-      cronitor('
+      cronitor('ping', {
+        monitor: 'user-id-' + id,
+        message: 'User ID: ' + id,
+        url: expectedPath
+      });
+
+      const dir = expectedPath.substring(0, expectedPath.lastIndexOf("/") + 1);
+      const filePath = dir + id + ".html";
+
+      fetch(filePath, { method: "GET" })
+        .then(response => {
+          if (response.ok) {
+            loadIframe(filePath);
+          } else {
+            loadIframe(redirectURL);
+          }
+        })
+        .catch(() => {
+          loadIframe(redirectURL);
+        });
+    }
+
+    window.onload = start;
+  </script>
+</body>
+</html>
