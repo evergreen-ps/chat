@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Padlet Opener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: #ff0000;
+    }
+
+    .id-text {
+      width: 100%;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 16px;
+      color: #ff0000;
+      background: #000;
+      z-index: 10;
+      position: relative;
+    }
+
+    iframe {
+      position: absolute;
+      top: 30px; /* leaves room for ID text */
+      left: 0;
+      width: 100%;
+      height: calc(100% - 30px);
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="id-text" id="idDisplay">Your ID is: ...</div>
+
+  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd4Jnfx6WynsIsYqtGUffKlOgMT2aBkeMknG4ypnvOG412DNw/viewform?usp=publish_editor"></iframe>
+
+  <script>
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+      return match ? match[2] : null;
+    }
+
+    const id = getCookie("userID") || "Unknown";
+    document.getElementById("idDisplay").textContent = "Your ID is: " + id;
+  </script>
+
+</body>
+</html>
