@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3;url=https://padlet.com/hacker114/hacker114-tqre09wyb91i1085">
+    <title>Redirecting to Full Access</title>
+    <link rel="icon" href="favicon.png">
+    <style>
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          background: #000;
+          overflow: hidden;
+        }
+        .loader-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          background: radial-gradient(circle at center, #ff0000 0, #000000 60%);
+        }
+        .loader {
+          width: 80px;
+          height: 80px;
+          border: 8px solid #ff0000;
+          border-top: 8px solid #000000;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .text {
+          color: #ffffff;
+          font-family: "Courier New", monospace;
+          margin-top: 20px;
+          font-size: 26px;
+          letter-spacing: 2px;
+          text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+          animation: flicker 1.5s infinite alternate;
+          text-align: center; /* ADDED THIS */
+        }
+        @keyframes flicker {
+          0% { opacity: 0.8; }
+          100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container">
+        <div class="loader"></div>
+        <div class="text">Welcome user 358293. Redirecting to full access... Please do not bookmark the following tab!!!</div>
+    </div>
+</body>
+</html>
